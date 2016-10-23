@@ -21,20 +21,20 @@
 		    	center: new google.maps.LatLng(2.8,-187.3),
 		    	mapTypeId: 'terrain'
 		    });
-
+			for (var i in binList) {
+				//var coords = results.features[i].geometry.coordinates;
+				var latLng = new google.maps.LatLng(binList[i].Latitude,binList[i].Longitude);
+				var marker = new google.maps.Marker({
+					position: latLng,
+					map: map
+				});
+			}
 		  
 	  	}
 
 		  // Loop through the results array and place a marker for each
 		  
-		for (var i in binList) {
-			//var coords = results.features[i].geometry.coordinates;
-			var latLng = new google.maps.LatLng(binList[i].Latitude,binList[i].Longitude);
-			var marker = new google.maps.Marker({
-				position: latLng,
-				map: map
-			});
-		}
+		
     </script>
 
 
