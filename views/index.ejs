@@ -2,41 +2,126 @@
 <html>
   <head>
     <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel='stylesheet' href='/stylesheets/index.css' />
   </head>
   <body>
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
+    <div class="dropdown">
+	  <button onclick="expandBoroughs();" class="dropbtn">Jump To Borough</button>
+	  <div id="boroughDropdown" class="dropdown-content">
+	    <button onclick="mapJumpTo('Manhattan');">Manhattan</button>
+	    <button onclick="mapJumpTo('Brooklyn');">Brooklyn</button>
+	    <button onclick="mapJumpTo('Bronx');">Bronx</button>
+	    <button onclick="mapJumpTo('Queens');">Queens</button>
+	    <button onclick="mapJumpTo('Staten Island');">Staten Island</button>
+	  </div>
+	</div>
     <div style="height:800px;width:800px" id="map"></div>
-	<p><%=data%></p>
 
 
+
+
+
+    <!-- ********** MAPS JAVASCRIPT ********** -->
     <script>
 		var binList = <%-JSON.stringify(data)%>;
 		console.log(binList[0].Borough);
     	var map;
 		function initMap() {
 			map = new google.maps.Map(document.getElementById('map'), {
-		    	zoom: 2,
+		    	zoom: 11,
 		    	center: new google.maps.LatLng(2.8,-187.3),
 		    	mapTypeId: 'terrain'
 		    });
+			//Save global reference to map
+			window.map_object = map;
+
+		    //Populate map with bin data
 			for (var i in binList) {
-				//var coords = results.features[i].geometry.coordinates;
 				var latLng = new google.maps.LatLng(binList[i].Latitude,binList[i].Longitude);
 				var marker = new google.maps.Marker({
 					position: latLng,
 					map: map
 				});
 			}
+			var infoWindow = new google.maps.InfoWindow({map: map});
+			//Try to find the user's position and center the map
+			if (navigator.geolocation) {
+          		navigator.geolocation.getCurrentPosition(function(position) {
+          			var lat = position.coords.latitude;
+          			var lon = position.coords.longitude;
+
+		            var pos = {
+		              	lat: lat,
+		              	lng: lon
+		            };
+		            infoWindow.setPosition(pos);
+		            infoWindow.setContent('This is you (hopefully).');
+		            setMapCenter(lat, lon);
+	          	}, function() {
+	            	handleLocationError(true, infoWindow, map.getCenter());
+	          	});
+        	} else {
+          		// Browser doesn't support Geolocation
+          		handleLocationError(false, infoWindow, map.getCenter());
+        	}
 		  
 	  	}
 
-		  // Loop through the results array and place a marker for each
-		  
-		
+	  	function setMapCenter(lat, lng, zoom){
+	  		var pos = {
+              	lat: lat,
+              	lng: lng
+            };
+            window.map_object.setCenter(pos);
+            window.map_object.setZoom(zoom ? zoom : 11); //default to 11
+	  	}
+
     </script>
 
+    <!-- ********** HTML ELEMENTS JAVASCRIPT ********** -->
+    <script>
+    	function expandBoroughs() {
+    		document.getElementById("boroughDropdown").classList.toggle("show");
+		}
+
+		// Close the dropdown menu if the user clicks outside of it
+		window.onclick = function(event) {
+		  if (!event.target.matches('.dropbtn')) {
+
+		    var dropdowns = document.getElementsByClassName("dropdown-content");
+		    var i;
+		    for (i = 0; i < dropdowns.length; i++) {
+		      var openDropdown = dropdowns[i];
+		      if (openDropdown.classList.contains('show')) {
+		        openDropdown.classList.remove('show');
+		      }
+		    }
+		  }
+		}
+
+		function mapJumpTo(borough){
+			switch(borough){
+				case "Manhattan":
+					setMapCenter(40.769065, -73.973608, 13);
+					break;
+				case "Brooklyn":
+					setMapCenter(40.674576, -73.941593, 13);
+					break;
+				case "Bronx":
+					setMapCenter(40.840211, -73.876641, 13);
+					break;
+				case "Queens":
+					setMapCenter(40.727623, -73.826426, 13);
+					break;
+				case "Staten Island":
+					setMapCenter(40.585205, -74.141407, 13);
+					break;
+			}
+		}
+
+    </script>
 
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqpLYMJ-PPUa4InFWr566c0fdc0ATNQsA&callback=initMap">
