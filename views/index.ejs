@@ -5,80 +5,36 @@
     <link rel='stylesheet' href='/stylesheets/index.css' />
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-    <div class="dropdown">
-	  <button onclick="expandBoroughs();" class="dropbtn">Jump To Borough</button>
-	  <div id="boroughDropdown" class="dropdown-content">
-	    <button onclick="mapJumpTo('Manhattan');">Manhattan</button>
-	    <button onclick="mapJumpTo('Brooklyn');">Brooklyn</button>
-	    <button onclick="mapJumpTo('Bronx');">Bronx</button>
-	    <button onclick="mapJumpTo('Queens');">Queens</button>
-	    <button onclick="mapJumpTo('Staten Island');">Staten Island</button>
-	  </div>
-	</div>
-    <div style="height:800px;width:800px" id="map"></div>
+    <div class="bodyContainer">
+    	<div id="options">
+	        <h1><%= title %></h1>
+	    	<p>Welcome to <%= title %></p>
+		    <div class="dropdown">
+			  <button onclick="expandBoroughs();" class="dropbtn">Jump To Borough</button>
+			  <div id="boroughDropdown" class="dropdown-content">
+			    <button onclick="mapJumpTo('Manhattan');">Manhattan</button>
+			    <button onclick="mapJumpTo('Brooklyn');">Brooklyn</button>
+			    <button onclick="mapJumpTo('Bronx');">Bronx</button>
+			    <button onclick="mapJumpTo('Queens');">Queens</button>
+			    <button onclick="mapJumpTo('Staten Island');">Staten Island</button>
+			  </div>
+			  <p>
+			  	Jump to location:
+			  	<input id="pac-input" class="controls" type="text" placeholder="Search Box">
+			  </p>
+			</div>
+		</div>
+	    <div id="map"></div>
+    </div>
 
 
 
 
 
     <!-- ********** MAPS JAVASCRIPT ********** -->
-    <script>
-		var binList = <%-JSON.stringify(data)%>;
-		console.log(binList[0].Borough);
-    	var map;
-		function initMap() {
-			map = new google.maps.Map(document.getElementById('map'), {
-		    	zoom: 11,
-		    	center: new google.maps.LatLng(2.8,-187.3),
-		    	mapTypeId: 'terrain'
-		    });
-			//Save global reference to map
-			window.map_object = map;
+    <script>window.binList = <%-JSON.stringify(data)%>;</script>
 
-		    //Populate map with bin data
-			for (var i in binList) {
-				var latLng = new google.maps.LatLng(binList[i].Latitude,binList[i].Longitude);
-				var marker = new google.maps.Marker({
-					position: latLng,
-					map: map
-				});
-			}
-			var infoWindow = new google.maps.InfoWindow({map: map});
-			//Try to find the user's position and center the map
-			if (navigator.geolocation) {
-          		navigator.geolocation.getCurrentPosition(function(position) {
-          			var lat = position.coords.latitude;
-          			var lon = position.coords.longitude;
-
-		            var pos = {
-		              	lat: lat,
-		              	lng: lon
-		            };
-		            infoWindow.setPosition(pos);
-		            infoWindow.setContent('This is you (hopefully).');
-		            setMapCenter(lat, lon);
-	          	}, function() {
-	            	handleLocationError(true, infoWindow, map.getCenter());
-	          	});
-        	} else {
-          		// Browser doesn't support Geolocation
-          		handleLocationError(false, infoWindow, map.getCenter());
-        	}
-		  
-	  	}
-
-	  	function setMapCenter(lat, lng, zoom){
-	  		var pos = {
-              	lat: lat,
-              	lng: lng
-            };
-            window.map_object.setCenter(pos);
-            window.map_object.setZoom(zoom ? zoom : 11); //default to 11
-	  	}
-
-    </script>
+    <script type="text/javascript" src="/javascripts/map.js"></script>
 
     <!-- ********** HTML ELEMENTS JAVASCRIPT ********** -->
     <script>
@@ -124,7 +80,7 @@
     </script>
 
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqpLYMJ-PPUa4InFWr566c0fdc0ATNQsA&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqpLYMJ-PPUa4InFWr566c0fdc0ATNQsA&libraries=places&callback=initMap">
     </script>
   </body>
 </html>
